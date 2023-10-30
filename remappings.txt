@@ -1,4 +1,4 @@
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 flywheel-v2/=lib/flywheel-v2/src/
-solady/=lib/solady/src/
+solmate/=lib/solmate/src/
