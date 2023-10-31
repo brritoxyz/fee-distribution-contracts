@@ -13,14 +13,15 @@ contract FeeDistributor is FlywheelCore {
         ERC20(0x4200000000000000000000000000000000000006);
 
     constructor(
-        address _owner
+        address _owner,
+        Authority _authority
     )
         FlywheelCore(
             _WETH,
             IFlywheelRewards(address(0)),
             IFlywheelBooster(address(0)),
             _owner,
-            Authority(address(0))
+            _authority
         )
     {}
 }

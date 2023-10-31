@@ -10,7 +10,11 @@ contract StakedBRR is ERC4626 {
     string private constant _NAME = "Fee printer go brr";
     string private constant _SYMBOL = "stakedBRR";
 
-    IFlywheelCore public constant REWARDS_MANAGER = IFlywheelCore(address(0));
+    IFlywheelCore public immutable flywheel;
+
+    constructor(address _flywheel) {
+        flywheel = IFlywheelCore(_flywheel);
+    }
 
     function asset() public pure override returns (address) {
         return _BRR;
@@ -35,7 +39,7 @@ contract StakedBRR is ERC4626 {
         uint256
     ) internal override {
         // Save gas by not calling `accrue` for the zero address.
-        if (from != address(0)) REWARDS_MANAGER.accrue(this, from);
-        if (to != address(0)) REWARDS_MANAGER.accrue(this, to);
+        if (from != address(0)) flywheel.accrue(this, from);
+        if (to != address(0)) flywheel.accrue(this, to);
     }
 }
