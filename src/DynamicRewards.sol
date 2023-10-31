@@ -10,13 +10,13 @@ import {RewardsStore} from "src/RewardsStore.sol";
 contract DynamicRewards is FlywheelDynamicRewards {
     using SafeCastLib for uint256;
 
-    uint32 private constant _REWARDS_CYCLE_LENGTH = 1 weeks;
     RewardsStore public immutable rewardsStore;
 
     constructor(
         address _rewardToken,
-        FlywheelCore _flywheel
-    ) FlywheelDynamicRewards(_flywheel, _REWARDS_CYCLE_LENGTH) {
+        FlywheelCore _flywheel,
+        uint32 _rewardsCycleLength
+    ) FlywheelDynamicRewards(_flywheel, _rewardsCycleLength) {
         rewardsStore = new RewardsStore(_rewardToken, address(this));
     }
 

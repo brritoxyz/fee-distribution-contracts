@@ -10,18 +10,21 @@ import {DynamicRewards} from "src/DynamicRewards.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
 contract FeeDistributorTest is Test {
-    ERC20 private constant _WETH =
-        ERC20(0x4200000000000000000000000000000000000006);
-
+    address public constant WETH = 0x4200000000000000000000000000000000000006;
+    uint32 public constant REWARDS_CYCLE_LENGTH = 1 weeks;
     address public immutable owner = address(this);
     FeeDistributor public immutable distributor;
     StakedBRR public immutable stakedBRR;
     DynamicRewards public immutable dynamicRewards;
 
-    constructor() {
-        distributor = new FeeDistributor(owner, Authority(address(0)));
+    constructor(address _rewardToken) {
+        distributor = new FeeDistributor(WETH, owner, Authority(address(0)));
         stakedBRR = new StakedBRR(address(distributor));
-        dynamicRewards = new DynamicRewards(address(_WETH), distributor);
+        dynamicRewards = new DynamicRewards(
+            _rewardToken,
+            distributor,
+            REWARDS_CYCLE_LENGTH
+        );
 
         distributor.setFlywheelRewards(dynamicRewards);
     }

@@ -9,15 +9,13 @@ import {ERC20} from "solmate/tokens/ERC20.sol";
 import {Authority} from "solmate/auth/Auth.sol";
 
 contract FeeDistributor is FlywheelCore {
-    ERC20 private constant _WETH =
-        ERC20(0x4200000000000000000000000000000000000006);
-
     constructor(
+        address _rewardToken,
         address _owner,
         Authority _authority
     )
         FlywheelCore(
-            _WETH,
+            ERC20(_rewardToken),
             IFlywheelRewards(address(0)),
             IFlywheelBooster(address(0)),
             _owner,
