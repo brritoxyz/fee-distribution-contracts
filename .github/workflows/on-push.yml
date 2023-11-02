@@ -1,6 +1,6 @@
-name: test
+name: forge-test
 
-on: workflow_dispatch
+on: [push]
 
 env:
   FOUNDRY_PROFILE: ci
@@ -22,13 +22,10 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge build
-        run: |
-          forge --version
-          forge build --sizes
-        id: build
-
       - name: Run Forge tests
+        env:
+          FOUNDRY_PROFILE: optimized
+          RPC_URL: ${{ secrets.BASE_RPC_URL }}
         run: |
-          forge test -vvv
+          forge test -vvv --fuzz-runs 1000 --rpc-url "$BASE_RPC_URL"
         id: test
