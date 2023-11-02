@@ -22,6 +22,10 @@ contract DynamicRewards is FlywheelDynamicRewards {
 
     /**
      * @notice Retrieves next cycle's rewards from the store contract to ensure proper accounting.
+     * @dev    For the sake of simplicity, we're not making use of the `strategy` param (assumption
+     *         is that stakedBRR is the only strategy - if this changes later, can update FlywheelRewards).
+     *         FlywheelCore also adds a layer of protection by checking whether the strategy exists
+     *         before calling `FlywheelDynamicRewards.getAccruedRewards`.
      */
     function getNextCycleRewards(ERC20) internal override returns (uint192) {
         return rewardsStore.transferNextCycleRewards().toUint192();

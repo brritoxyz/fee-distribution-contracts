@@ -16,43 +16,41 @@ contract Helper is Test {
     address public constant WETH = 0x4200000000000000000000000000000000000006;
     uint32 public constant REWARDS_CYCLE_LENGTH = 1 weeks;
     address public immutable owner = address(this);
-    FlywheelCore public immutable distributor;
+    FlywheelCore public immutable flywheel;
     StakedBRR public immutable stakedBRR;
     DynamicRewards public immutable dynamicRewards;
     RewardsStore public immutable dynamicRewardsStore;
 
     constructor() {
-        distributor = new FlywheelCore(
+        flywheel = new FlywheelCore(
             ERC20(WETH),
             IFlywheelRewards(address(0)),
             IFlywheelBooster(address(0)),
             owner,
             Authority(address(0))
         );
-        stakedBRR = new StakedBRR(address(distributor));
+        stakedBRR = new StakedBRR(address(flywheel));
         dynamicRewards = new DynamicRewards(
             WETH,
-            distributor,
+            flywheel,
             REWARDS_CYCLE_LENGTH
         );
         dynamicRewardsStore = dynamicRewards.rewardsStore();
 
-        distributor.setFlywheelRewards(dynamicRewards);
-        distributor.addStrategyForRewards(ERC20(address(stakedBRR)));
+        flywheel.setFlywheelRewards(dynamicRewards);
+        flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));
 
-        assertEq(
-            address(dynamicRewards),
-            address(distributor.flywheelRewards())
+        assertEq(address(dynamicRewards), address(flywheel.flywheelRewards()));
+        assertEq(owner, flywheel.owner());
+
+        (uint224 index, uint32 lastUpdatedTimestamp) = flywheel.strategyState(
+            ERC20(address(stakedBRR))
         );
-        assertEq(owner, distributor.owner());
 
-        (uint224 index, uint32 lastUpdatedTimestamp) = distributor
-            .strategyState(ERC20(address(stakedBRR)));
-
-        assertEq(index, distributor.ONE());
+        assertEq(index, flywheel.ONE());
         assertEq(lastUpdatedTimestamp, block.timestamp);
-        assertEq(address(distributor), address(stakedBRR.flywheel()));
-        assertEq(address(distributor), address(dynamicRewards.flywheel()));
+        assertEq(address(flywheel), address(stakedBRR.flywheel()));
+        assertEq(address(flywheel), address(dynamicRewards.flywheel()));
         assertEq(REWARDS_CYCLE_LENGTH, dynamicRewards.rewardsCycleLength());
         assertEq(WETH, dynamicRewardsStore.rewardToken());
         assertEq(
