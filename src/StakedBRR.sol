@@ -2,6 +2,7 @@
 pragma solidity 0.8.10;
 
 import {ERC20} from "solady/tokens/ERC20.sol";
+import {ERC20 as SolmateERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {IFlywheelCore} from "src/interfaces/IFlywheelCore.sol";
 
@@ -39,8 +40,9 @@ contract StakedBRR is ERC20 {
         uint256
     ) internal override {
         // Save gas by not calling `accrue` for the zero address.
-        if (from != address(0)) flywheel.accrue(this, from);
-        if (to != address(0)) flywheel.accrue(this, to);
+        if (from != address(0))
+            flywheel.accrue(SolmateERC20(address(this)), from);
+        if (to != address(0)) flywheel.accrue(SolmateERC20(address(this)), to);
     }
 
     /**

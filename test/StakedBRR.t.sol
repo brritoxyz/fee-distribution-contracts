@@ -2,7 +2,7 @@
 pragma solidity 0.8.10;
 
 import "forge-std/Test.sol";
-import {ERC20} from "solady/tokens/ERC20.sol";
+import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {StakedBRR} from "src/StakedBRR.sol";
 import {MockFlywheelCore} from "test/mocks/MockFlywheelCore.sol";
