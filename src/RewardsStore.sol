@@ -24,6 +24,6 @@ contract RewardsStore {
 
         amount = rewardToken.balanceOf(address(this));
 
-        rewardToken.safeTransfer(flywheelRewards, amount);
+        rewardToken.safeTransfer(msg.sender, amount);
     }
 }
