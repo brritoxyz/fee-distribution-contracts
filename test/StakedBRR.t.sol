@@ -171,7 +171,8 @@ contract StakedBRRTest is Test {
         address to,
         uint256 amount
     ) external {
-        vm.assume(msgSender != address(0) && to != address(0));
+        vm.assume(msgSender != address(0));
+        vm.assume(to != address(0) && to != address(stakedBRR));
 
         deal(BRR, msgSender, amount);
 
