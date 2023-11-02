@@ -101,4 +101,94 @@ contract StakedBRRTest is Test {
         assertEq(address(stakedBRR), address(strategy));
         assertEq(to, user);
     }
+
+    /*//////////////////////////////////////////////////////////////
+                             unstake
+    //////////////////////////////////////////////////////////////*/
+
+    function testCannotUnstakeInvalidTo() external {
+        vm.expectRevert(StakedBRR.InvalidTo.selector);
+
+        stakedBRR.unstake(address(0), 1);
+    }
+
+    function testUnstake() external {
+        address msgSender = address(this);
+        uint256 amount = 1;
+
+        deal(BRR, msgSender, amount);
+        BRR.safeApprove(address(stakedBRR), amount);
+        stakedBRR.stake(msgSender, amount);
+
+        address to = address(1);
+        uint256 msgSenderStakedBRRBalance = stakedBRR.balanceOf(msgSender);
+        uint256 toBRRBalance = BRR.balanceOf(to);
+        uint256 flywheelCounter = flywheel.counter();
+
+        vm.expectEmit(true, true, false, true, address(stakedBRR));
+
+        emit Transfer(msgSender, address(0), amount);
+
+        vm.expectEmit(true, true, false, true, BRR);
+
+        emit Transfer(address(stakedBRR), to, amount);
+
+        stakedBRR.unstake(to, amount);
+
+        assertEq(
+            msgSenderStakedBRRBalance - amount,
+            stakedBRR.balanceOf(msgSender)
+        );
+        assertEq(toBRRBalance + amount, BRR.balanceOf(to));
+        assertEq(flywheelCounter + 1, flywheel.counter());
+
+        (ERC20 strategy, address user) = flywheel.accrueCall();
+
+        assertEq(address(stakedBRR), address(strategy));
+        assertEq(msgSender, user);
+    }
+
+    function testUnstakeFuzz(
+        address msgSender,
+        address to,
+        uint256 amount
+    ) external {
+        vm.assume(msgSender != address(0) && to != address(0));
+
+        deal(BRR, msgSender, amount);
+
+        vm.startPrank(msgSender);
+
+        BRR.safeApprove(address(stakedBRR), amount);
+        stakedBRR.stake(msgSender, amount);
+
+        vm.stopPrank();
+
+        uint256 msgSenderStakedBRRBalance = stakedBRR.balanceOf(msgSender);
+        uint256 toBRRBalance = BRR.balanceOf(to);
+        uint256 flywheelCounter = flywheel.counter();
+
+        vm.prank(msgSender);
+        vm.expectEmit(true, true, false, true, address(stakedBRR));
+
+        emit Transfer(msgSender, address(0), amount);
+
+        vm.expectEmit(true, true, false, true, BRR);
+
+        emit Transfer(address(stakedBRR), to, amount);
+
+        stakedBRR.unstake(to, amount);
+
+        assertEq(
+            msgSenderStakedBRRBalance - amount,
+            stakedBRR.balanceOf(msgSender)
+        );
+        assertEq(toBRRBalance + amount, BRR.balanceOf(to));
+        assertEq(flywheelCounter + 1, flywheel.counter());
+
+        (ERC20 strategy, address user) = flywheel.accrueCall();
+
+        assertEq(address(stakedBRR), address(strategy));
+        assertEq(msgSender, user);
+    }
 }
