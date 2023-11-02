@@ -11,6 +11,8 @@ contract StakedBRRTest is Test {
     using SafeTransferLib for address;
 
     address public constant BRR = 0x6d80d90ce251985bF41A98c6FDd6b7b975Fff884;
+    string private constant NAME = "Fee printer go brr";
+    string private constant SYMBOL = "stakedBRR";
     MockFlywheelCore public immutable flywheel = new MockFlywheelCore();
     StakedBRR public immutable stakedBRR;
 
@@ -18,6 +20,22 @@ contract StakedBRRTest is Test {
 
     constructor() {
         stakedBRR = new StakedBRR(address(flywheel));
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                             name
+    //////////////////////////////////////////////////////////////*/
+
+    function testName() external {
+        assertEq(NAME, stakedBRR.name());
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                             symbol
+    //////////////////////////////////////////////////////////////*/
+
+    function testSymbol() external {
+        assertEq(SYMBOL, stakedBRR.symbol());
     }
 
     /*//////////////////////////////////////////////////////////////
