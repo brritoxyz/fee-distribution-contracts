@@ -12,7 +12,7 @@ import {DynamicRewards} from "src/DynamicRewards.sol";
 import {RewardsStore} from "src/RewardsStore.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 
-contract FeeDistributorTest is Test {
+contract Helper is Test {
     address public constant WETH = 0x4200000000000000000000000000000000000006;
     uint32 public constant REWARDS_CYCLE_LENGTH = 1 weeks;
     address public immutable owner = address(this);
