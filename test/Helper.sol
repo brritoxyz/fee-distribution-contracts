@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
 import "forge-std/Test.sol";
 import {Authority} from "solmate/auth/Auth.sol";
@@ -36,6 +36,12 @@ contract Helper is Test {
             REWARDS_CYCLE_LENGTH
         );
         dynamicRewardsStore = dynamicRewards.rewardsStore();
+
+        // Hacky workaround since the zero address has a non-zero WETH balance which
+        // causes `setFlywheelRewards` to revert when FlywheelCore tries to do a transfer.
+        vm.prank(address(0));
+
+        ERC20(WETH).approve(address(flywheel), type(uint256).max);
 
         flywheel.setFlywheelRewards(dynamicRewards);
         flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));

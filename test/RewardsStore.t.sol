@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
 import "forge-std/Test.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
@@ -45,7 +45,7 @@ contract RewardsStoreTest is Test, Helper {
         );
     }
 
-    function testTransferNextCycleRewardsFuzz(uint256 amount) external {
+    function testTransferNextCycleRewardsFuzz(uint192 amount) external {
         address msgSender = dynamicRewardsStore.flywheelRewards();
 
         deal(WETH, address(dynamicRewardsStore), amount);
