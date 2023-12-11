@@ -2,11 +2,39 @@
 pragma solidity ^0.8.10;
 
 import "forge-std/Script.sol";
+import {Authority} from "solmate/auth/Auth.sol";
+import {ERC20} from "solmate/tokens/ERC20.sol";
+import {FlywheelCore} from "flywheel-v2/FlywheelCore.sol";
+import {IFlywheelRewards} from "flywheel-v2/interfaces/IFlywheelRewards.sol";
+import {IFlywheelBooster} from "flywheel-v2/interfaces/IFlywheelBooster.sol";
+import {FlywheelDynamicRewards} from "flywheel-v2/rewards/FlywheelDynamicRewards.sol";
+import {DynamicRewards} from "src/DynamicRewards.sol";
+import {StakedBRR} from "src/StakedBRR.sol";
 
 contract FeeDistributorScript is Script {
-    function setUp() public {}
+    address public constant WETH = 0x4200000000000000000000000000000000000006;
+    uint32 public constant REWARDS_CYCLE_LENGTH = 1 weeks;
 
     function run() public {
-        vm.broadcast();
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+
+        FlywheelCore flywheel = new FlywheelCore(
+            ERC20(WETH),
+            IFlywheelRewards(address(0)),
+            IFlywheelBooster(address(0)),
+            vm.envAddress("OWNER"),
+            Authority(address(0))
+        );
+        DynamicRewards dynamicRewards = new DynamicRewards(
+            WETH,
+            flywheel,
+            REWARDS_CYCLE_LENGTH
+        );
+        ERC20 stakedBRR = ERC20(address(new StakedBRR(address(flywheel))));
+
+        flywheel.setFlywheelRewards(dynamicRewards);
+        flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));
+
+        vm.stopBroadcast();
     }
 }
