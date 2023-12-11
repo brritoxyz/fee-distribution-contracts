@@ -37,12 +37,7 @@ contract Helper is Test {
         );
         dynamicRewardsStore = dynamicRewards.rewardsStore();
 
-        // Hacky workaround since the zero address has a non-zero WETH balance which
-        // causes `setFlywheelRewards` to revert when FlywheelCore tries to do a transfer.
-        vm.prank(address(0));
-
         ERC20(WETH).approve(address(flywheel), type(uint256).max);
-
         flywheel.setFlywheelRewards(dynamicRewards);
         flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));
 
