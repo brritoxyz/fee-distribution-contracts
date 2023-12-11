@@ -3,10 +3,11 @@ cache/
 out/
 optimized-out/
 
-# Ignores development broadcast logs
-!/broadcast
-/broadcast/*/31337/
-/broadcast/**/dry-run/
+# Ignores development broadcast logs, except for run-latest.json
+!broadcast/FeeDistributor.s.sol/
+broadcast/FeeDistributor.s.sol/dry-run
+broadcast/FeeDistributor.s.sol/8453/*
+!broadcast/FeeDistributor.s.sol/8453/run-latest.json
 
 # Dotenv file
 .env
