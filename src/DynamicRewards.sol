@@ -1,23 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
+import {ERC20} from "solmate/tokens/ERC20.sol";
 import {FlywheelCore} from "flywheel-v2/FlywheelCore.sol";
 import {FlywheelDynamicRewards} from "flywheel-v2/rewards/FlywheelDynamicRewards.sol";
-import {ERC20} from "solmate/tokens/ERC20.sol";
+import {Ownable} from "solady/auth/Ownable.sol";
 import {SafeCastLib} from "solady/utils/SafeCastLib.sol";
 import {RewardsStore} from "src/RewardsStore.sol";
 
-contract DynamicRewards is FlywheelDynamicRewards {
+contract DynamicRewards is Ownable, FlywheelDynamicRewards {
     using SafeCastLib for uint256;
 
-    RewardsStore public immutable rewardsStore;
+    RewardsStore public rewardsStore;
+
+    event SetRewardsStore(address);
+
+    error InvalidAddress();
 
     constructor(
-        address _rewardToken,
         FlywheelCore _flywheel,
-        uint32 _rewardsCycleLength
+        uint32 _rewardsCycleLength,
+        address initialOwner
     ) FlywheelDynamicRewards(_flywheel, _rewardsCycleLength) {
-        rewardsStore = new RewardsStore(_rewardToken, address(this));
+        _initializeOwner(initialOwner);
+    }
+
+    /**
+     * Set the rewards store.
+     * @param _rewardsStore  address  RewardsStore contract address.
+     */
+    function setRewardsStore(address _rewardsStore) external onlyOwner {
+        if (_rewardsStore == address(0)) revert InvalidAddress();
+
+        rewardsStore = RewardsStore(_rewardsStore);
+
+        emit SetRewardsStore(_rewardsStore);
     }
 
     /**
@@ -30,4 +47,12 @@ contract DynamicRewards is FlywheelDynamicRewards {
     function getNextCycleRewards(ERC20) internal override returns (uint192) {
         return rewardsStore.transferNextCycleRewards().toUint192();
     }
+
+    /*//////////////////////////////////////////////////////////////
+                    ENFORCE 2-STEP OWNERSHIP TRANSFERS
+    //////////////////////////////////////////////////////////////*/
+
+    function transferOwnership(address) public payable override {}
+
+    function renounceOwnership() public payable override {}
 }

@@ -9,6 +9,7 @@ import {IFlywheelRewards} from "flywheel-v2/interfaces/IFlywheelRewards.sol";
 import {IFlywheelBooster} from "flywheel-v2/interfaces/IFlywheelBooster.sol";
 import {FlywheelDynamicRewards} from "flywheel-v2/rewards/FlywheelDynamicRewards.sol";
 import {DynamicRewards} from "src/DynamicRewards.sol";
+import {RewardsStore} from "src/RewardsStore.sol";
 import {StakedBRR} from "src/StakedBRR.sol";
 
 contract FeeDistributorScript is Script {
@@ -26,12 +27,17 @@ contract FeeDistributorScript is Script {
             Authority(address(0))
         );
         DynamicRewards dynamicRewards = new DynamicRewards(
-            WETH,
             flywheel,
-            REWARDS_CYCLE_LENGTH
+            REWARDS_CYCLE_LENGTH,
+            vm.envAddress("OWNER")
+        );
+        RewardsStore dynamicRewardsStore = new RewardsStore(
+            WETH,
+            address(dynamicRewards)
         );
         ERC20 stakedBRR = ERC20(address(new StakedBRR(address(flywheel))));
 
+        dynamicRewards.setRewardsStore(address(dynamicRewardsStore));
         flywheel.setFlywheelRewards(dynamicRewards);
         flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));
 

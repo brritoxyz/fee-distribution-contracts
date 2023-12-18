@@ -31,12 +31,13 @@ contract Helper is Test {
         );
         stakedBRR = new StakedBRR(address(flywheel));
         dynamicRewards = new DynamicRewards(
-            WETH,
             flywheel,
-            REWARDS_CYCLE_LENGTH
+            REWARDS_CYCLE_LENGTH,
+            address(this)
         );
-        dynamicRewardsStore = dynamicRewards.rewardsStore();
+        dynamicRewardsStore = new RewardsStore(WETH, address(dynamicRewards));
 
+        dynamicRewards.setRewardsStore(address(dynamicRewardsStore));
         ERC20(WETH).approve(address(flywheel), type(uint256).max);
         flywheel.setFlywheelRewards(dynamicRewards);
         flywheel.addStrategyForRewards(ERC20(address(stakedBRR)));
