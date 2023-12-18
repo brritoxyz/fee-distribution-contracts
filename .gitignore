@@ -8,6 +8,10 @@ optimized-out/
 broadcast/FeeDistributor.s.sol/dry-run
 broadcast/FeeDistributor.s.sol/8453/*
 !broadcast/FeeDistributor.s.sol/8453/run-latest.json
+!broadcast/UpdateDynamicRewards.s.sol/
+broadcast/UpdateDynamicRewards.s.sol/dry-run
+broadcast/UpdateDynamicRewards.s.sol/8453/*
+!broadcast/UpdateDynamicRewards.s.sol/8453/run-latest.json
 
 # Dotenv file
 .env
