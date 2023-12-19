@@ -61,8 +61,11 @@ contract DynamicRewardsTest is Test, Helper {
 
         emit DynamicRewards.SetRewardsStore(_rewardsStore, nextCycleRewards);
 
-        dynamicRewards.setRewardsStore(_rewardsStore);
+        uint256 retrievedRewards = dynamicRewards.setRewardsStore(
+            _rewardsStore
+        );
 
+        assertEq(retrievedRewards, nextCycleRewards);
         assertEq(_rewardsStore, address(dynamicRewards.rewardsStore()));
         assertEq(0, WETH.balanceOf(currentRewardsStore));
         assertEq(
@@ -93,8 +96,11 @@ contract DynamicRewardsTest is Test, Helper {
 
         emit DynamicRewards.SetRewardsStore(_rewardsStore, nextCycleRewards);
 
-        dynamicRewards.setRewardsStore(_rewardsStore);
+        uint256 retrievedRewards = dynamicRewards.setRewardsStore(
+            _rewardsStore
+        );
 
+        assertEq(retrievedRewards, nextCycleRewards);
         assertEq(_rewardsStore, address(dynamicRewards.rewardsStore()));
         assertEq(0, WETH.balanceOf(currentRewardsStore));
         assertEq(
