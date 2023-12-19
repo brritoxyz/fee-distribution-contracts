@@ -13,7 +13,7 @@ contract DynamicRewards is Ownable, FlywheelDynamicRewards {
 
     RewardsStore public rewardsStore;
 
-    event SetRewardsStore(address);
+    event SetRewardsStore(address, uint256);
 
     error InvalidAddress();
 
@@ -27,14 +27,21 @@ contract DynamicRewards is Ownable, FlywheelDynamicRewards {
 
     /**
      * Set the rewards store.
-     * @param _rewardsStore  address  RewardsStore contract address.
+     * @param _rewardsStore      address  RewardsStore contract address.
+     * @return retrievedRewards  uint256  Rewards transferred from the old rewards store.
      */
-    function setRewardsStore(address _rewardsStore) external onlyOwner {
+    function setRewardsStore(
+        address _rewardsStore
+    ) external onlyOwner returns (uint256 retrievedRewards) {
         if (_rewardsStore == address(0)) revert InvalidAddress();
+
+        // Retrieve the outstanding rewards from the current rewards store.
+        if (address(rewardsStore) != address(0))
+            retrievedRewards = rewardsStore.transferNextCycleRewards();
 
         rewardsStore = RewardsStore(_rewardsStore);
 
-        emit SetRewardsStore(_rewardsStore);
+        emit SetRewardsStore(_rewardsStore, retrievedRewards);
     }
 
     /**

@@ -41,17 +41,66 @@ contract DynamicRewardsTest is Test, Helper {
     function testSetRewardsStore() external {
         address msgSender = dynamicRewards.owner();
         address _rewardsStore = address(1);
+        address currentRewardsStore = address(dynamicRewards.rewardsStore());
+        uint256 nextCycleRewards = 1e18;
 
-        assertTrue(_rewardsStore != address(dynamicRewards.rewardsStore()));
+        deal(WETH, currentRewardsStore, nextCycleRewards);
+
+        uint256 currentRewardsStoreBalanceBefore = WETH.balanceOf(
+            currentRewardsStore
+        );
+        uint256 dynamicRewardsBalanceBefore = WETH.balanceOf(
+            address(dynamicRewards)
+        );
+
+        assertEq(currentRewardsStoreBalanceBefore, nextCycleRewards);
+        assertTrue(_rewardsStore != currentRewardsStore);
 
         vm.prank(msgSender);
         vm.expectEmit(true, true, true, true, address(dynamicRewards));
 
-        emit DynamicRewards.SetRewardsStore(_rewardsStore);
+        emit DynamicRewards.SetRewardsStore(_rewardsStore, nextCycleRewards);
 
         dynamicRewards.setRewardsStore(_rewardsStore);
 
         assertEq(_rewardsStore, address(dynamicRewards.rewardsStore()));
+        assertEq(0, WETH.balanceOf(currentRewardsStore));
+        assertEq(
+            dynamicRewardsBalanceBefore + nextCycleRewards,
+            WETH.balanceOf(address(dynamicRewards))
+        );
+    }
+
+    function testSetRewardsStoreFuzz(uint80 nextCycleRewards) external {
+        address msgSender = dynamicRewards.owner();
+        address _rewardsStore = address(1);
+        address currentRewardsStore = address(dynamicRewards.rewardsStore());
+
+        deal(WETH, currentRewardsStore, nextCycleRewards);
+
+        uint256 currentRewardsStoreBalanceBefore = WETH.balanceOf(
+            currentRewardsStore
+        );
+        uint256 dynamicRewardsBalanceBefore = WETH.balanceOf(
+            address(dynamicRewards)
+        );
+
+        assertEq(currentRewardsStoreBalanceBefore, nextCycleRewards);
+        assertTrue(_rewardsStore != currentRewardsStore);
+
+        vm.prank(msgSender);
+        vm.expectEmit(true, true, true, true, address(dynamicRewards));
+
+        emit DynamicRewards.SetRewardsStore(_rewardsStore, nextCycleRewards);
+
+        dynamicRewards.setRewardsStore(_rewardsStore);
+
+        assertEq(_rewardsStore, address(dynamicRewards.rewardsStore()));
+        assertEq(0, WETH.balanceOf(currentRewardsStore));
+        assertEq(
+            dynamicRewardsBalanceBefore + nextCycleRewards,
+            WETH.balanceOf(address(dynamicRewards))
+        );
     }
 
     /*//////////////////////////////////////////////////////////////
