@@ -165,4 +165,77 @@ contract StakedBRRTest is Test, Helper {
         );
         assertEq(0, flywheel.rewardsAccrued(to));
     }
+
+    /*//////////////////////////////////////////////////////////////
+                             unstake
+    //////////////////////////////////////////////////////////////*/
+
+    function testCannotUnstakeInvalidTo() external {
+        address to = address(0);
+        uint256 amount = 1;
+
+        vm.expectRevert(StakedBRR.InvalidTo.selector);
+
+        stakedBRR.unstake(to, amount);
+    }
+
+    function testCannotUnstakeInsufficientBalance() external {
+        address to = address(this);
+        uint256 amount = 1;
+
+        vm.expectRevert(ERC20.InsufficientBalance.selector);
+
+        stakedBRR.unstake(to, amount);
+    }
+
+    function testUnstake() external {
+        address to = address(this);
+        uint256 amount = BRR.balanceOf(address(this));
+
+        BRR.safeApprove(address(stakedBRR), type(uint256).max);
+
+        stakedBRR.stake(to, amount);
+
+        uint256 stakedBRRBalance = stakedBRR.balanceOf(address(this));
+        uint256 brrBalance = BRR.balanceOf(to);
+
+        vm.expectEmit(true, true, true, true, address(stakedBRR));
+
+        emit ERC20.Transfer(address(this), address(0), amount);
+
+        vm.expectEmit(true, true, true, true, BRR);
+
+        emit ERC20.Transfer(address(stakedBRR), to, amount);
+
+        stakedBRR.unstake(to, amount);
+
+        assertEq(stakedBRRBalance - amount, stakedBRR.balanceOf(address(this)));
+        assertEq(brrBalance + amount, BRR.balanceOf(to));
+    }
+
+    function testUnstakeFuzz(address to, uint88 amount) external {
+        vm.assume(to != address(0) && amount != 0);
+
+        deal(BRR, address(this), amount);
+
+        BRR.safeApprove(address(stakedBRR), type(uint256).max);
+
+        stakedBRR.stake(address(this), amount);
+
+        uint256 stakedBRRBalance = stakedBRR.balanceOf(address(this));
+        uint256 brrBalance = BRR.balanceOf(to);
+
+        vm.expectEmit(true, true, true, true, address(stakedBRR));
+
+        emit ERC20.Transfer(address(this), address(0), amount);
+
+        vm.expectEmit(true, true, true, true, BRR);
+
+        emit ERC20.Transfer(address(stakedBRR), to, amount);
+
+        stakedBRR.unstake(to, amount);
+
+        assertEq(stakedBRRBalance - amount, stakedBRR.balanceOf(address(this)));
+        assertEq(brrBalance + amount, BRR.balanceOf(to));
+    }
 }
