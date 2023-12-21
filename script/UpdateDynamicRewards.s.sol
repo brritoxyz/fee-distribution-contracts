@@ -32,7 +32,6 @@ contract UpdateDynamicRewardsScript is Script {
         );
 
         dynamicRewards.setRewardsStore(address(dynamicRewardsStore));
-        FLYWHEEL.setFlywheelRewards(dynamicRewards);
 
         vm.stopBroadcast();
     }
